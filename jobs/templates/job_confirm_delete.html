@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Delete {{ object.title }} — Workwise{% endblock %}
+
+{% block content %}
+<section class="panel delete-panel">
+    <div class="delete-icon" aria-hidden="true">!</div>
+    <p class="eyebrow eyebrow-light">Please confirm</p>
+    <h1>Delete this job listing?</h1>
+    <p><strong>{{ object.title }}</strong> at {{ object.company_name }} will be permanently removed. Existing applications for this job will also be deleted.</p>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-actions">
+            <button class="button button-danger" type="submit">Yes, delete listing</button>
+            <a class="button button-quiet" href="{% url 'jobs:job_detail' object.pk %}">Keep listing</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

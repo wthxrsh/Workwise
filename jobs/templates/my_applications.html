@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}My applications — Workwise{% endblock %}
+
+{% block content %}
+<header class="page-heading">
+    <div>
+        <p class="eyebrow eyebrow-light">Your search, in one place</p>
+        <h1>My applications</h1>
+        <p>Keep track of the roles you’ve taken the next step with.</p>
+    </div>
+    <a class="button button-outline" href="{% url 'jobs:job_list' %}">Explore more jobs <span aria-hidden="true">→</span></a>
+</header>
+<section class="listing-stack" aria-label="Your applications">
+    {% for application in my_applications %}
+        <article class="listing-row">
+            <div class="company-avatar" aria-hidden="true">{{ application.job.company_name|first|upper }}</div>
+            <div class="listing-main">
+                <h3><a href="{% url 'jobs:job_detail' application.job.pk %}">{{ application.job.title }}</a></h3>
+                <p>{{ application.job.company_name }} · {{ application.job.location }}</p>
+            </div>
+            <span class="status-pill">Application sent</span>
+            <span class="application-date">{{ application.date_applied|date:"M j, Y" }}</span>
+            {% if application.resume %}
+                <a class="text-link" href="{% url 'jobs:resume_download' application.pk %}">Resume PDF ↓</a>
+            {% else %}
+                <span class="application-date">No resume on file</span>
+            {% endif %}
+            <a class="text-link" href="{% url 'jobs:job_detail' application.job.pk %}">View role →</a>
+        </article>
+    {% empty %}
+        <div class="empty-state">
+            <div class="empty-icon" aria-hidden="true">↗</div>
+            <h3>Your next opportunity is out there</h3>
+            <p>When you apply to a role, it’ll show up here so you can easily find it again.</p>
+            <a class="button button-primary" href="{% url 'jobs:job_list' %}">Browse open jobs</a>
+        </div>
+    {% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Create an account — Workwise{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+    <header class="auth-intro">
+        <div class="brand-mark" aria-hidden="true">w</div>
+        <h1>Find your next step</h1>
+        <p>Join Workwise as a candidate or an employer.</p>
+    </header>
+    <section class="panel auth-panel form-panel">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="button button-primary" type="submit">Create account <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="auth-switch">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+    </section>
+</div>
+{% endblock %}

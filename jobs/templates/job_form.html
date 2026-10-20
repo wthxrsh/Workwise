@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Edit listing{% else %}Post a job{% endif %} — Workwise{% endblock %}
+
+{% block content %}
+<a class="back-link" href="{% if object %}{% url 'jobs:job_detail' object.pk %}{% else %}{% url 'jobs:job_list' %}{% endif %}"><span aria-hidden="true">←</span> Cancel and go back</a>
+<div class="form-layout">
+    <header class="page-heading">
+        <div>
+            <p class="eyebrow eyebrow-light">{% if object %}Keep your listing up to date{% else %}Find your next great teammate{% endif %}</p>
+            <h1>{% if object %}Edit this opportunity{% else %}Create a job listing{% endif %}</h1>
+            <p>Add the details candidates need to find the right fit.</p>
+        </div>
+    </header>
+    <section class="panel form-panel">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="form-actions">
+                <button class="button button-primary" type="submit">{% if object %}Save changes{% else %}Publish job{% endif %} <span aria-hidden="true">→</span></button>
+                <a class="button button-quiet" href="{% if object %}{% url 'jobs:job_detail' object.pk %}{% else %}{% url 'jobs:job_list' %}{% endif %}">Cancel</a>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}

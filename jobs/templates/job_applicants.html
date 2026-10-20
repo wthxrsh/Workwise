@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Applicants for {{ job.title }} — Workwise{% endblock %}
+
+{% block content %}
+<a class="back-link" href="{% url 'jobs:my_jobs' %}"><span aria-hidden="true">←</span> Back to my listings</a>
+<header class="page-heading">
+    <div>
+        <p class="eyebrow eyebrow-light">Candidate applications</p>
+        <h1>{{ job.title }}</h1>
+        <p>{{ job.company_name }} · {{ applications|length }} applicant{{ applications|length|pluralize }}</p>
+    </div>
+</header>
+<section class="listing-stack" aria-label="Applicants">
+    {% for application in applications %}
+        <article class="listing-row">
+            <div class="company-avatar" aria-hidden="true">{{ application.applicant.username|first|upper }}</div>
+            <div class="listing-main">
+                <h3>{{ application.applicant.get_full_name|default:application.applicant.username }}</h3>
+                <p>{{ application.applicant.email }} · Applied {{ application.date_applied|date:"M j, Y" }}</p>
+            </div>
+            {% if application.resume %}
+                <a class="button button-outline button-small" href="{% url 'jobs:resume_download' application.pk %}">Download resume <span aria-hidden="true">↓</span></a>
+            {% else %}
+                <span class="application-date">Resume not available for this older application</span>
+            {% endif %}
+        </article>
+    {% empty %}
+        <div class="empty-state">
+            <div class="empty-icon" aria-hidden="true">♙</div>
+            <h3>No applications yet</h3>
+            <p>When candidates apply, their applications and resumes will appear here.</p>
+        </div>
+    {% endfor %}
+</section>
+{% endblock %}

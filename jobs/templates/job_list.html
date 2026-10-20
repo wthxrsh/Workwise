@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Find your next role — Workwise{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div>
+        <p class="eyebrow">Make your next move</p>
+        <h1>Good work starts<br>with the right fit.</h1>
+        <p class="hero-copy">Explore thoughtful opportunities from teams ready to meet you.</p>
+    </div>
+    <div class="hero-art" aria-hidden="true"><div class="hero-art-inner">✳</div></div>
+</section>
+
+<form class="search-panel" method="get" role="search">
+    <label class="search-field">
+        <span aria-hidden="true">⌕</span>
+        <input type="search" name="q" value="{{ search_query }}" placeholder="Job title, company, or keyword" aria-label="Search jobs">
+    </label>
+    <label class="search-field">
+        <span aria-hidden="true">⌖</span>
+        <select name="location" aria-label="Filter by location">
+            <option value="">Anywhere</option>
+            {% for location in locations %}
+                <option value="{{ location }}" {% if selected_location == location %}selected{% endif %}>{{ location }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <button class="button button-primary search-submit" type="submit">Find jobs <span aria-hidden="true">→</span></button>
+</form>
+
+<section aria-labelledby="jobs-heading">
+    <div class="section-heading">
+        <div>
+            <h2 id="jobs-heading">Explore opportunities</h2>
+            <p>Find a role that moves you forward.</p>
+        </div>
+        <span class="result-count">{{ result_count }} role{{ result_count|pluralize }}</span>
+    </div>
+    <div class="job-grid">
+        {% for job in all_jobs %}
+            <article class="job-card">
+                <div class="job-card-top">
+                    <div class="company-avatar" aria-hidden="true">{{ job.company_name|first|upper }}</div>
+                    <span class="status-pill">New opportunity</span>
+                </div>
+                <h3><a href="{% url 'jobs:job_detail' job.pk %}">{{ job.title }}</a></h3>
+                <p class="company-name">{{ job.company_name }}</p>
+                <div class="job-meta">
+                    <span><span aria-hidden="true">⌖</span> {{ job.location }}</span>
+                    <span><span aria-hidden="true">◷</span> Posted {{ job.date_posted|date:"M j, Y" }}</span>
+                </div>
+                <div class="job-card-footer">
+                    <span class="salary">₹{{ job.salary|floatformat:0 }} <span class="company-name">/ year</span></span>
+                    <a class="text-link" href="{% url 'jobs:job_detail' job.pk %}">View role <span aria-hidden="true">→</span></a>
+                </div>
+            </article>
+        {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon" aria-hidden="true">⌕</div>
+                <h3>No matching roles yet</h3>
+                <p>Try a different keyword or location, or clear your search to see every open opportunity.</p>
+                {% if search_query or selected_location %}
+                    <a class="button button-outline" href="{% url 'jobs:job_list' %}">Clear filters</a>
+                {% elif user.is_authenticated and user.role == "employer" %}
+                    <a class="button button-primary" href="{% url 'jobs:job_create' %}">Post the first role</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    {% if is_paginated %}
+        <nav class="pagination" aria-label="Job pages">
+            {% if page_obj.has_previous %}
+                <a href="?q={{ search_query|urlencode }}&location={{ selected_location|urlencode }}&page={{ page_obj.previous_page_number }}">← Previous</a>
+            {% endif %}
+            <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?q={{ search_query|urlencode }}&location={{ selected_location|urlencode }}&page={{ page_obj.next_page_number }}">Next →</a>
+            {% endif %}
+        </nav>
+    {% endif %}
+</section>
+{% endblock %}

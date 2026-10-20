@@ -1,0 +1,66 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f8fc">
+    <title>{% block title %}Workwise — Find work that fits{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'jobs/css/site.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="nav-shell">
+            <a class="brand" href="{% url 'jobs:job_list' %}" aria-label="Workwise home">
+                <span class="brand-mark">w</span>
+                <span>workwise<span class="brand-period">.</span></span>
+            </a>
+            <nav class="main-nav" aria-label="Main navigation">
+                <a href="{% url 'jobs:job_list' %}">Find jobs</a>
+                {% if user.is_authenticated %}
+                    {% if user.role == "employer" %}
+                        <a href="{% url 'jobs:my_jobs' %}">My listings</a>
+                    {% else %}
+                        <a href="{% url 'jobs:my_applications' %}">My applications</a>
+                    {% endif %}
+                {% endif %}
+            </nav>
+            <div class="nav-actions">
+                {% if user.is_authenticated %}
+                    <span class="user-greeting">Hi, {{ user.first_name|default:user.username }}</span>
+                    {% if user.role == "employer" %}
+                        <a class="button button-primary button-small" href="{% url 'jobs:job_create' %}">Post a job <span aria-hidden="true">↗</span></a>
+                    {% endif %}
+                    <form method="post" action="{% url 'logout' %}" class="logout-form">
+                        {% csrf_token %}
+                        <button class="button button-quiet button-small" type="submit">Log out</button>
+                    </form>
+                {% else %}
+                    <a class="button button-quiet button-small" href="{% url 'login' %}">Log in</a>
+                    <a class="button button-primary button-small" href="{% url 'accounts:signup' %}">Create account <span aria-hidden="true">↗</span></a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        {% if messages %}
+            <div class="messages" aria-live="polite">
+                {% for message in messages %}
+                    <div class="message message-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-shell">
+            <a class="brand brand-footer" href="{% url 'jobs:job_list' %}">
+                <span class="brand-mark">w</span><span>workwise<span class="brand-period">.</span></span>
+            </a>
+            <span>A better next step starts here.</span>
+        </div>
+    </footer>
+</body>
+</html>

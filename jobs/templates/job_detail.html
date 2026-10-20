@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}{{ object.title }} at {{ object.company_name }} — Workwise{% endblock %}
+
+{% block content %}
+<a class="back-link" href="{% url 'jobs:job_list' %}"><span aria-hidden="true">←</span> Back to all jobs</a>
+<div class="detail-layout">
+    <article class="panel detail-main">
+        <div class="detail-company">
+            <div class="company-avatar" aria-hidden="true">{{ object.company_name|first|upper }}</div>
+            <div>
+                <h1>{{ object.title }}</h1>
+                <p>{{ object.company_name }}</p>
+            </div>
+        </div>
+        <div class="detail-meta">
+            <span><span aria-hidden="true">⌖</span> {{ object.location }}</span>
+            <span>₹{{ object.salary|floatformat:0 }} / year</span>
+            <span><span aria-hidden="true">◷</span> Posted {{ object.date_posted|date:"M j, Y" }}</span>
+        </div>
+        <h2>About the role</h2>
+        <div class="description-copy">{{ object.description }}</div>
+        {% if user == object.posted_by %}
+            <div class="detail-actions">
+                <a class="button button-outline" href="{% url 'jobs:job_update' object.pk %}">Edit listing</a>
+                <a class="button button-quiet" href="{% url 'jobs:job_delete' object.pk %}">Delete</a>
+            </div>
+        {% endif %}
+    </article>
+    <aside class="panel detail-aside">
+        <h2>Interested in this role?</h2>
+        {% if user.is_authenticated %}
+            {% if user.role == "seeker" and user != object.posted_by %}
+                {% if already_applied %}
+                    <p>Your application is in. Good luck!</p>
+                    <span class="button button-outline">✓ Application sent</span>
+                {% else %}
+                    <p>Take the next step and let the team know you’re interested.</p>
+                    <form method="post" enctype="multipart/form-data" action="{% url 'jobs:apply_to_job' object.pk %}" class="form-panel">
+                        {% csrf_token %}
+                        {{ resume_form.as_p }}
+                        <button class="button button-primary" type="submit">Apply with resume <span aria-hidden="true">→</span></button>
+                    </form>
+                {% endif %}
+            {% else %}
+                <p>Applications are open to job seekers for jobs posted by someone else.</p>
+            {% endif %}
+        {% else %}
+            <p>Sign in or create an account to apply for this opportunity.</p>
+            <a class="button button-primary" href="{% url 'login' %}?next={{ request.path|urlencode }}">Log in to apply <span aria-hidden="true">→</span></a>
+        {% endif %}
+        <div class="aside-divider"></div>
+        <div class="poster-row">
+            <div class="company-avatar" aria-hidden="true">{{ object.company_name|first|upper }}</div>
+            <span>Posted by<strong>{{ object.posted_by.get_full_name|default:object.posted_by.username }}</strong></span>
+        </div>
+    </aside>
+</div>
+{% endblock %}
